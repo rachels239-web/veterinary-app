@@ -37,6 +37,10 @@ jobs:
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     permissions:
+      # A job-level permissions block REPLACES the top-level one rather than
+      # adding to it, so contents: read has to be repeated here or checkout
+      # cannot read the repository.
+      contents: read
       pages: write
       id-token: write
     environment:
