@@ -1,0 +1,13 @@
+{
+  "name": "vetapp",
+  "version": "1.0.0",
+  "description": "Veterinary clinical calculators for dogs and cats — fluids, CRIs, CPR and dosing.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "icons": "node tools/make-icons.mjs",
+    "serve": "node tools/serve.mjs"
+  },
+  "license": "MIT"
+}

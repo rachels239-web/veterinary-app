@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>VetApp — clinical calculators</title>
+  <meta name="description" content="Fluid therapy, CRI, CPR and dosing calculators for dogs and cats.">
+  <meta name="theme-color" content="#0e7c72" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0d1318" media="(prefers-color-scheme: dark)">
+
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icons/favicon-32.png" sizes="32x32">
+  <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="VetApp">
+  <meta name="mobile-web-app-capable" content="yes">
+
+  <link rel="stylesheet" href="./css/app.css">
+</head>
+<body>
+  <div id="app">
+    <noscript>
+      <p style="padding:24px;font:16px system-ui">
+        VetApp needs JavaScript to calculate. Please enable it and reload.
+      </p>
+    </noscript>
+  </div>
+
+  <script type="module">
+    import { boot } from './src/ui/app.js';
+    boot();
+  </script>
+</body>
+</html>

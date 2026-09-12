@@ -1,0 +1,54 @@
+name: Test and deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      # No dependencies to install — the app and its tests are dependency-free.
+      - name: Run formula tests
+        run: npm test
+      - name: Check the icons are in step with the generator
+        run: |
+          node tools/make-icons.mjs
+          git diff --exit-code -- icons/ \
+            || (echo "::error::icons/ is out of date — run 'npm run icons' and commit the result" && exit 1)
+
+  deploy:
+    name: Deploy to Pages
+    needs: test
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - name: Upload site
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # The whole repo is the site — there is no build step.
+          path: .
+      - id: deployment
+        uses: actions/deploy-pages@v4
