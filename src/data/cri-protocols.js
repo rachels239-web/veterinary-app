@@ -28,7 +28,7 @@ export const CRI_PROTOCOLS = [
     longName: 'Methadone + Ketamine (feline)',
     species: ['cat'],
     components: [
-      { drug: 'methadone', load: 0.1, rate: 0.12 },
+      { drug: 'methadone', load: 0.1, rate: 0.1 },
       { drug: 'ketamine', load: 0.5, rate: 0.6 },
     ],
     provenance: 'House protocol',

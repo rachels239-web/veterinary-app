@@ -19,10 +19,10 @@ export const CRI_DRUGS = [
     displayUnit: 'mg/kg/hr',
     species: {
       dog: { load: 0.2, rate: 0.1, range: [0.05, 0.2], loadRange: [0.1, 0.3] },
-      cat: { load: 0.1, rate: 0.12, range: [0.05, 0.15], loadRange: [0.05, 0.2] },
+      cat: { load: 0.1, rate: 0.1, range: [0.05, 0.15], loadRange: [0.05, 0.2] },
     },
     provenance: 'House protocol',
-    notes: 'Full mu agonist. Feline CRI rate here is higher than the canine rate — confirm against your own protocol.',
+    notes: 'Full mu agonist. Same CRI rate in cats and dogs.',
   },
   {
     id: 'ketamine',

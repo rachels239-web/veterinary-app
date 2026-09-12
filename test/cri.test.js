@@ -101,13 +101,13 @@ test('syringe pump mix is independent of any fluid rate', () => {
 
   assert.equal(mix.pumpRateMlHr, 5);
   assert.equal(mix.runsForHr, 12);
-  // Methadone 0.12 mg/kg/hr x 4 kg x 12 hr = 5.76 mg, from 10 mg/mL = 0.576 mL
-  close(byName(mix.mixes, 'Methadone').totalMg, 5.76, 1e-9);
-  close(byName(mix.mixes, 'Methadone').stockVolumeMl, 0.576, 1e-9);
+  // Methadone 0.1 mg/kg/hr x 4 kg x 12 hr = 4.8 mg, from 10 mg/mL = 0.48 mL
+  close(byName(mix.mixes, 'Methadone').totalMg, 4.8, 1e-9);
+  close(byName(mix.mixes, 'Methadone').stockVolumeMl, 0.48, 1e-9);
   // Ketamine 0.6 x 4 x 12 = 28.8 mg, from 100 mg/mL = 0.288 mL
   close(byName(mix.mixes, 'Ketamine').totalMg, 28.8, 1e-9);
   close(byName(mix.mixes, 'Ketamine').stockVolumeMl, 0.288, 1e-9);
-  close(mix.diluentMl, 60 - 0.576 - 0.288, 1e-9);
+  close(mix.diluentMl, 60 - 0.48 - 0.288, 1e-9);
 });
 
 test('driving the syringe by pump rate gives the same mix as by duration', () => {
