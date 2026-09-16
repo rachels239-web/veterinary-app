@@ -30,12 +30,20 @@ It then opens full screen with its own icon and works with no signal.
 
 ## Deploying
 
-Pushing to `main` runs the tests and publishes to GitHub Pages automatically.
-Enable it once, under **Settings → Pages → Source: GitHub Actions**.
+Live at **https://rachels239-web.github.io/veterinary-app/**
 
-Free GitHub Pages requires a public repository. If you later want it private,
-Cloudflare Pages and Netlify both deploy private repos on their free tiers —
-point them at this repo with no build command and `/` as the output directory.
+Pushing to `main` runs the tests and publishes automatically. Three one-time
+settings were needed to get there, all under the repository's Settings:
+
+1. **Visibility: public** — free GitHub Pages will not publish a private repo.
+2. **Pages → Source: GitHub Actions** — the workflow token cannot enable this
+   itself.
+3. **Default branch: `main`** — it started as the feature branch because the
+   repository was empty on the first push.
+
+If you ever want it private again, Cloudflare Pages and Netlify both deploy
+private repos on their free tiers — point them at this repo with no build
+command and `/` as the output directory.
 
 ## Adding things
 

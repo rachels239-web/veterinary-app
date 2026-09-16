@@ -43,6 +43,18 @@ jobs:
       contents: read
       pages: write
       id-token: write
+    # NOTE: deliberately no `environment: github-pages` block here.
+    #
+    # The usual Pages template declares that environment, but this repository's
+    # github-pages environment was created while the default branch was still
+    # the original feature branch, so its deployment-branch rule rejects main.
+    # With the block present the job was refused before it started — it failed
+    # in two seconds with no steps and no logs. Deploying without declaring the
+    # environment works; the only thing lost is the environment link in the
+    # repository sidebar.
+    #
+    # To restore it: Settings -> Environments -> github-pages -> Deployment
+    # branches, allow main, then add the block back.
     steps:
       - uses: actions/checkout@v4
       # Pages must be enabled once by the repository owner:
