@@ -48,11 +48,11 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+      # Pages must be enabled once by the repository owner:
+      #   Settings -> Pages -> Source: GitHub Actions
+      # The workflow token is not permitted to create the Pages site itself
+      # ("Resource not accessible by integration"), so this cannot be automated.
       - uses: actions/configure-pages@v5
-        with:
-          # Turn Pages on via the API rather than requiring a trip through
-          # Settings. Needs the repository to be public on a free plan.
-          enablement: true
       - name: Upload site
         uses: actions/upload-pages-artifact@v3
         with:
