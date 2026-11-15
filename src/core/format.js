@@ -91,3 +91,22 @@ export function duration(hours) {
   if (m === 60) return `${h + 1} hr`;
   return `${h} hr ${m} min`;
 }
+
+/**
+ * Parse text from a numeric field.
+ *
+ * Deliberately tolerant of part-typed input: "4." and "0." and "" are all
+ * states a user passes through on the way to a real number, and must not be
+ * treated as errors. Returns null for anything that is not yet a number.
+ *
+ * A comma is accepted as the decimal separator, since a keyboard set to a
+ * European locale offers that key rather than a full stop.
+ */
+export function parseNumber(text) {
+  if (text === null || text === undefined) return null;
+  if (typeof text === 'number') return Number.isFinite(text) ? text : null;
+  const cleaned = String(text).trim().replace(',', '.');
+  if (cleaned === '' || cleaned === '.' || cleaned === '-' || cleaned === '-.') return null;
+  const value = Number(cleaned);
+  return Number.isFinite(value) ? value : null;
+}

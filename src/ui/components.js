@@ -2,21 +2,77 @@
 // "show the calculation" panel.
 
 import { h, clear } from './dom.js';
-import { fmt, exact as exactText, trim } from '../core/format.js';
+import { fmt, exact as exactText, trim, parseNumber } from '../core/format.js';
 
 /* ---------- inputs ---------- */
 
-export function numberField({ id, label, value, unit, step = 'any', min, max, hint, onInput, placeholder, disabled }) {
+/**
+ * Exactly what the user typed into each numeric field, keyed by field id.
+ *
+ * A re-render rebuilds every field from the parsed number, which would turn a
+ * half-typed "4." back into "4" and make a decimal point impossible to enter.
+ * Keeping the raw text means the field shows what was typed, while the rest of
+ * the app sees the parsed value.
+ */
+const rawFieldText = new Map();
+
+/**
+ * The id of the field the user is currently typing in, set by the renderer
+ * before it rebuilds the tree.
+ *
+ * While a field is being edited it shows exactly what was typed — including
+ * nothing at all. Screens fall back to a default when a field is cleared
+ * (`v ?? 3`), and without this the default would be written straight back into
+ * the box, so clearing a field and typing a new number would append to the old
+ * one: clear "3", type "2.5", get "32.5". Once focus moves on, the field shows
+ * the real value again.
+ */
+let editingFieldId = null;
+
+export function setEditingField(id) {
+  editingFieldId = id ?? null;
+}
+
+/**
+ * A numeric input.
+ *
+ * Deliberately type="text" with inputmode="decimal" rather than type="number":
+ * number inputs reject intermediate states like "4." in some browsers, refuse
+ * to report a caret position (which breaks focus restoration across renders),
+ * and disagree with each other about comma decimal separators. inputmode still
+ * brings up the numeric keypad on a phone.
+ */
+export function numberField({ id, label, value, unit, step, min, max, hint, onInput, placeholder, disabled }) {
+  const raw = rawFieldText.get(id);
+  const isEditing = editingFieldId === id;
+  let display;
+  if (isEditing && raw !== undefined) {
+    display = raw;
+  } else {
+    // Not being edited: drop the stale text and show the value in use.
+    rawFieldText.delete(id);
+    display = value ?? '';
+  }
+
   const input = h('input.field-input', {
-    type: 'number', id, step, min, max, disabled,
-    value: value ?? '',
+    type: 'text', id, disabled,
+    value: display,
     placeholder: placeholder ?? '',
     inputmode: 'decimal',
+    autocomplete: 'off',
+    autocorrect: 'off',
+    spellcheck: false,
+    'data-min': min, 'data-max': max, 'data-step': step,
     oninput: (e) => {
-      const raw = e.target.value;
-      onInput(raw === '' ? null : Number(raw));
+      rawFieldText.set(id, e.target.value);
+      onInput(parseNumber(e.target.value));
     },
+    // Deliberately no blur handler to tidy "4." into "4": re-rendering detaches
+    // the focused input, which fires blur mid-edit, and any cleanup there wipes
+    // the decimal point before the next digit can be typed. The raw text is
+    // dropped on its own as soon as it stops matching the field's value.
   });
+
   return h('label.field', { for: id },
     h('span.field-label', label),
     h('div.field-row', input, unit ? h('span.field-unit', unit) : null),

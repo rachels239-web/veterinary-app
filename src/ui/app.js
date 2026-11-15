@@ -1,7 +1,7 @@
 // App shell: patient bar, navigation, and screen rendering.
 
 import { h, clear, $ } from './dom.js';
-import { numberField, segmented, card } from './components.js';
+import { numberField, segmented, card, setEditingField } from './components.js';
 import { patient, prefs, setPatient, setPrefs, hasPatient } from '../core/state.js';
 import { checkWeight } from '../core/safety.js';
 import { issueList } from './components.js';
@@ -133,11 +133,48 @@ function disclaimer() {
   );
 }
 
+/* ---------- preserving the user's place across a re-render ---------- */
+
+// Every keystroke re-renders, which replaces the element being typed into.
+// Without this the field loses focus after each character and the caret jumps
+// to the end of any text that survives.
+
+function captureFocus() {
+  const el = document.activeElement;
+  if (!el || !el.id || el === document.body) return null;
+  const state = { id: el.id };
+  // Only text-like inputs expose a caret; reading it elsewhere throws.
+  try {
+    state.start = el.selectionStart;
+    state.end = el.selectionEnd;
+  } catch {
+    // Not a text input — focus alone is enough.
+  }
+  return state;
+}
+
+function restoreFocus(state) {
+  if (!state) return;
+  const el = document.getElementById(state.id);
+  if (!el || el === document.activeElement) return;
+  el.focus({ preventScroll: true });
+  if (state.start === null || state.start === undefined) return;
+  try {
+    el.setSelectionRange(state.start, state.end);
+  } catch {
+    // Element cannot hold a caret; focus is still restored.
+  }
+}
+
 /* ---------- render ---------- */
 
 function render() {
   const root = $('#app');
   if (!root) return;
+
+  const focus = captureFocus();
+  setEditingField(focus?.id);
+  const scrollY = window.scrollY;
 
   const screen = SCREENS.find((s) => s.id === activeId) ?? SCREENS[0];
   const needsPatient = screen.needsPatient !== false;
@@ -170,6 +207,10 @@ function render() {
 
   clear(root);
   root.append(topbar(), patientBar(), nav(), main);
+
+  restoreFocus(focus);
+  // Rebuilding the tree can shift the page under the user mid-edit.
+  if (window.scrollY !== scrollY) window.scrollTo({ top: scrollY, behavior: 'instant' });
 }
 
 function updateHistoryBadge() {

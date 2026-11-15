@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { roundVolume, roundMass, round, exact, fmt, duration } from '../src/core/format.js';
+import { roundVolume, roundMass, round, exact, fmt, duration, parseNumber } from '../src/core/format.js';
 
 test('volumes round to 1 dp at or above 1 mL', () => {
   assert.equal(roundVolume(4.1666), 4.2);
@@ -54,4 +54,44 @@ test('duration reads naturally', () => {
   assert.equal(duration(0.5), '30 min');
   assert.equal(duration(6), '6 hr');
   assert.equal(duration(14.285), '14 hr 17 min');
+});
+
+test('parseNumber tolerates part-typed input', () => {
+  // These are states a user passes through while typing and must not be
+  // treated as errors, or the decimal point can never be entered.
+  assert.equal(parseNumber('4'), 4);
+  assert.equal(parseNumber('4.'), 4);
+  assert.equal(parseNumber('4.5'), 4.5);
+  assert.equal(parseNumber('.5'), 0.5);
+  assert.equal(parseNumber('0.'), 0);
+});
+
+test('parseNumber returns null for anything not yet a number', () => {
+  assert.equal(parseNumber(''), null);
+  assert.equal(parseNumber('   '), null);
+  assert.equal(parseNumber('.'), null);
+  assert.equal(parseNumber('-'), null);
+  assert.equal(parseNumber('abc'), null);
+  assert.equal(parseNumber(null), null);
+  assert.equal(parseNumber(undefined), null);
+  assert.equal(parseNumber(NaN), null);
+  assert.equal(parseNumber(Infinity), null);
+});
+
+test('parseNumber accepts a comma decimal separator', () => {
+  // A keyboard set to a European locale offers a comma, not a full stop.
+  assert.equal(parseNumber('4,5'), 4.5);
+  assert.equal(parseNumber('0,25'), 0.25);
+});
+
+test('parseNumber keeps whole and negative numbers intact', () => {
+  assert.equal(parseNumber(' 20 '), 20);
+  assert.equal(parseNumber('-3.5'), -3.5);
+  assert.equal(parseNumber(12), 12);
+});
+
+test('a part-typed decimal parses to the value the field still shows', () => {
+  // The field keeps the raw text only while it parses to the current value,
+  // so this equality is what lets "4." survive long enough to become "4.5".
+  assert.equal(parseNumber('4.'), parseNumber('4'));
 });
